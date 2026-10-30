@@ -3,82 +3,113 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## Google Maps Photos Scraper (Places, Menus & Local Guides) — AI Co-Pilot & Multi-App Pipeline\n\nExtracts fresh data on a schedule with the **[google-maps-photos-scraper Apify Actor](https://apify.com/unitbytes/google-maps-photos-scraper?fpr=939u3w&fp_sid=n8n_io)** ($0.0015 / item), skips seen records, logs all rows to **Google Sheets** and **CSV**, and enriches top matches with **OpenAI (`gpt-4o-mini`)** for **Slack** and **Gmail**.\n\n### How it works\n1. **Every 6 Hours** loads rules from **1. Configure Search & Rules**.\n2. **2. Run UnitBytes (google-maps-photos-scraper)** fetches data and **3. Skip Seen Records** deduplicates by `photoId`.\n3. **4. Clean & Score Items** and **5. Map Export Fields** normalize `placeName, photoUrl, photoUrlHighRes, category` and compute `priorityScore`.\n4. **6a. Log to Google Sheets** and **6b. Export Backup CSV** save all rows, while **6c. Filter High-Priority Items** routes top matches to **7. AI Review Triage & Response Drafter**.\n5. **8. Merge AI Review Audit & Reply** merges AI fields and triggers **9a. Send ORM Review Alert to Slack** and **9b. Draft ORM Incident Report in Gmail**.\n\n### Setup\n1. Add your token from [google-maps-photos-scraper on Apify Store](https://apify.com/unitbytes/google-maps-photos-scraper?fpr=939u3w&fp_sid=n8n_io) to the **HTTP Header Auth** credential on node 2 (`Name`: `Authorization`, `Value`: `Bearer <YOUR_APIFY_TOKEN>`).\n2. Edit `actorInput`, `sheetTab`, and `minGuideLevel` in node 1.\n3. Connect **OpenAI**, **Google Sheets**, **Slack**, and **Gmail** credentials.\n\n### Customization\n- Adjust `minGuideLevel` in node 1 or the prompt in node 7.\n- Docs: [https://unitbytes.com/actors/google-maps-photos-scraper/](https://unitbytes.com/actors/google-maps-photos-scraper/)",
-        "height": 780,
-        "width": 560,
-        "color": 1
+        "content": "## Audit Google Maps venue photos with OpenAI to Google Sheets, Gmail, and Slack\n\n### How it works\n\nThis workflow runs every six hours to extract fresh records through the **[google-maps-photos-scraper](https://apify.com/unitbytes/google-maps-photos-scraper?fpr=939u3w&fp_sid=n8n_io)** UnitBytes Apify actor ($0.0015 / item), remove previously seen items by `photoId`, and normalize and score the dataset (`placeName, photoUrl, photoUrlHighRes, category`). It maps the cleaned fields for export, logs all rows to **Google Sheets**, creates a backup **CSV** file, and sends only high-priority records into **OpenAI (`gpt-4o-mini`)** for structured analysis and action drafting. The enriched fields are then merged and delivered to **Slack** and **Gmail**.\n\n### Setup steps\n\n- Configure the schedule interval in **When Every 6 Hours** if six hours is not ideal for your cadence.\n- Add your Apify API token from [google-maps-photos-scraper on Apify Store](https://apify.com/unitbytes/google-maps-photos-scraper?fpr=939u3w&fp_sid=n8n_io) (`Authorization: Bearer <YOUR_APIFY_TOKEN>`) in **Post to Google Maps Photos Scraper (Places, Menus & Local Guides) API** and confirm `actorInput` in **Set Search Parameters**.\n- Connect **Google Sheets** credentials in **Append Data to Sheets** and select your destination spreadsheet.\n- Configure **OpenAI** credentials in **AI Review Triage and Response Drafter** and review the `gpt-4o-mini` system prompt.\n- Connect **Slack** and **Gmail** credentials on the final delivery nodes.\n- Review `minGuideLevel` and `priorityKeyword` in **Set Search Parameters** before activating.\n\n### Customization\n\nAdjust `actorInput`, `minGuideLevel`, `priorityKeyword`, the OpenAI prompt, Slack message formatting, and Gmail template fields to match your workflow. Full schema and input docs: [https://unitbytes.com/actors/google-maps-photos-scraper/](https://unitbytes.com/actors/google-maps-photos-scraper/)",
+        "width": 480,
+        "height": 896
       },
       "id": "efc4a408-fe73-54fb-9fb2-7ac00142d274",
-      "name": "Overview",
+      "name": "Sticky Note",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -640,
-        -80
+        -560,
+        -288
       ]
     },
     {
       "parameters": {
-        "content": "## 1. Schedule & Search Settings\nTriggers on schedule and sets target search parameters, Google Sheets tab, and alert thresholds.",
-        "height": 380,
-        "width": 440,
+        "content": "## Schedule search rules\n\nStarts the workflow on a six-hour schedule and defines the search input, destination sheet tab, scoring threshold, and priority keyword rules used downstream.",
+        "width": 416,
+        "height": 336,
         "color": 7
       },
       "id": "a16452c0-639d-5d3f-98c9-b3f5f41cb7bb",
-      "name": "Section 1 — Schedule & Settings",
+      "name": "Sticky Note1",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
         0,
-        60
+        48
       ]
     },
     {
       "parameters": {
-        "content": "## 2. Extract & Deduplicate\nRuns the UnitBytes Apify Actor and skips records already processed in previous runs.",
-        "height": 380,
-        "width": 440,
+        "content": "## Scrape and deduplicate\n\nRuns the UnitBytes Apify actor through a synchronous HTTP request and removes records that have already been processed in previous executions.",
+        "width": 416,
+        "height": 320,
         "color": 7
       },
       "id": "7b709ab5-7ad9-5c71-8b33-6df2a14e8342",
-      "name": "Section 2 — Extract & Deduplicate",
+      "name": "Sticky Note2",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        460,
-        60
+        448,
+        64
       ]
     },
     {
       "parameters": {
-        "content": "## 3. Clean, Score & Flatten\nNormalizes fields, parses numeric metrics, and calculates a 0–100 priority score.",
-        "height": 380,
-        "width": 440,
+        "content": "## Clean and map items\n\nNormalizes raw scraper fields, parses numeric metrics, calculates 0–100 priority scores, and maps the cleaned data into export-ready fields.",
+        "width": 416,
+        "height": 336,
         "color": 7
       },
       "id": "060d0846-cb20-5648-8959-0cb2b0a9a126",
-      "name": "Section 3 — Clean, Score & Flatten",
+      "name": "Sticky Note3",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        920,
-        60
+        912,
+        48
       ]
     },
     {
       "parameters": {
-        "content": "## 4. Sheets, CSV & AI Co-Pilot\nLogs all rows to Sheets and CSV, enriches high-priority items with OpenAI, and alerts teams.",
-        "height": 740,
-        "width": 980,
+        "content": "## Export and prioritize\n\nBranches the mapped data into persistent outputs by logging to Google Sheets and creating a backup CSV, while filtering the stream down to high-priority items for AI enrichment.",
+        "width": 240,
+        "height": 816,
         "color": 7
       },
       "id": "e094f512-11fd-5d48-ac52-98005ed6e108",
-      "name": "Section 4 — Sheets, CSV & AI Co-Pilot",
+      "name": "Sticky Note4",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1380,
-        -80
+        1392,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Enrich with OpenAI\n\nUses OpenAI (`gpt-4o-mini`) to analyze high-priority records and merges the AI-generated headline, verdict, analysis, and draft with the original item fields.",
+        "width": 416,
+        "height": 336,
+        "color": 7
+      },
+      "id": "14c7da1a-7e34-571c-b896-3e5934ce2c2d",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1664,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Notify and route actions\n\nDelivers the enriched high-priority insights by posting formatted alerts to Slack and creating ready-to-send outreach drafts or instant alerts.",
+        "width": 240,
+        "height": 640,
+        "color": 7
+      },
+      "id": "cafeee5f-9318-5e74-b9b8-e04cb7b30cd9",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2112,
+        0
       ]
     },
     {
@@ -93,7 +124,7 @@
         }
       },
       "id": "5a6fb517-d6c7-5f8c-8055-f7381eb29f8e",
-      "name": "Every 6 Hours",
+      "name": "When Every 6 Hours",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
@@ -108,7 +139,7 @@
             {
               "id": "87a7ce46-860b-5e23-8003-885cadc8f9a3",
               "name": "actorInput",
-              "value": "{\"placeUrls\": [\"https://www.google.com/maps/place/Katz's+Delicatessen/@40.722233,-73.987429,17z/\"], \"maxPhotos\": 50, \"maxPlacesPerSearch\": 1, \"highResOnly\": true, \"scrapePhotos\": true}",
+              "value": "{\"placeUrls\": [\"https://www.google.com/maps/place/Katz's+Delicatessen/@40.722233,-73.987429,17z/\"], \"maxPhotos\": 5, \"maxPlacesPerSearch\": 1, \"highResOnly\": true, \"scrapePhotos\": true}",
               "type": "object"
             },
             {
@@ -134,7 +165,7 @@
         "options": {}
       },
       "id": "e6e18fb1-bb16-56e9-95aa-9a7eb298b439",
-      "name": "1. Configure Search & Rules",
+      "name": "Set Search Parameters",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
@@ -171,7 +202,7 @@
         }
       },
       "id": "a2e7645f-8dec-588b-b9c2-87bd8f1822bb",
-      "name": "2. Run UnitBytes (google-maps-photos-scraper)",
+      "name": "Post to Google Maps Photos Scraper (Places, Menus & Local Guides) API",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
@@ -186,7 +217,7 @@
         "options": {}
       },
       "id": "588831a6-0885-5192-887c-0268a405ce87",
-      "name": "3. Skip Seen Records",
+      "name": "Deduplicate All Fields",
       "type": "n8n-nodes-base.removeDuplicates",
       "typeVersion": 2,
       "position": [
@@ -196,10 +227,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// Normalize fields, parse numeric metrics, and score items for AI enrichment\nconst config = $('1. Configure Search & Rules').first().json;\nconst threshold = Number(config.minGuideLevel !== undefined ? config.minGuideLevel : 4);\nconst keywordFilter = String(config.priorityKeyword || '').trim().toLowerCase();\nconst primaryKeys = [\"placeName\", \"photoUrl\", \"photoUrlHighRes\", \"category\", \"name\", \"placeRating\"];\n\nreturn $input.all().map((item) => {\n  const raw = item.json || {};\n  const cleaned = { ...raw };\n\n  for (const k of primaryKeys) {\n    if (typeof cleaned[k] === 'string') {\n      cleaned[k] = cleaned[k].replace(/\\s+/g, ' ').trim();\n    }\n  }\n\n  const recordId = String(cleaned.photoId || cleaned.id || cleaned.url || '');\n  const titleText = String(cleaned.placeName || cleaned.name || recordId).slice(0, 180);\n  const itemUrl = String(cleaned.photoUrl || '');\n  const rawMetric = cleaned.localGuideLevel || cleaned.placeRating || 0;\n  const numericValue = Number(String(rawMetric).replace(/[^0-9.-]/g, '')) || 0;\n\n  let priorityScore = 50;\n  let isHighPriority = false;\n\n  if (numericValue >= threshold) {\n    priorityScore = Math.min(100, Math.round(70 + Math.min(numericValue / Math.max(threshold, 1), 3) * 10));\n    isHighPriority = true;\n  }\n\n  if (keywordFilter && titleText.toLowerCase().includes(keywordFilter)) {\n    priorityScore = Math.min(100, priorityScore + 20);\n    isHighPriority = true;\n  }\n\n  return {\n    json: {\n      ...cleaned,\n      recordId,\n      titleText,\n      itemUrl,\n      numericValue,\n      priorityScore,\n      isHighPriority,\n      alertSummary: titleText + ' (Metric: ' + numericValue + ' | Score: ' + priorityScore + '/100)',\n      scrapedAt: new Date().toISOString(),\n    },\n  };\n});"
+        "jsCode": "// Normalize fields, parse numeric metrics, and score items for AI enrichment\nconst config = $('Set Search Parameters').first().json;\nconst threshold = Number(config.minGuideLevel !== undefined ? config.minGuideLevel : 4);\nconst keywordFilter = String(config.priorityKeyword || '').trim().toLowerCase();\nconst primaryKeys = [\"placeName\", \"photoUrl\", \"photoUrlHighRes\", \"category\", \"name\", \"placeRating\"];\n\nreturn $input.all().map((item) => {\n  const raw = item.json || {};\n  const cleaned = { ...raw };\n\n  for (const k of primaryKeys) {\n    if (typeof cleaned[k] === 'string') {\n      cleaned[k] = cleaned[k].replace(/\\s+/g, ' ').trim();\n    }\n  }\n\n  const recordId = String(cleaned.photoId || cleaned.id || cleaned.url || '');\n  const titleText = String(cleaned.placeName || cleaned.name || recordId).slice(0, 180);\n  const itemUrl = String(cleaned.photoUrl || '');\n  const rawMetric = cleaned.localGuideLevel || cleaned.placeRating || 0;\n  const numericValue = Number(String(rawMetric).replace(/[^0-9.-]/g, '')) || 0;\n\n  let priorityScore = 50;\n  let isHighPriority = false;\n\n  if (numericValue >= threshold) {\n    priorityScore = Math.min(100, Math.round(70 + Math.min(numericValue / Math.max(threshold, 1), 3) * 10));\n    isHighPriority = true;\n  }\n\n  if (keywordFilter && titleText.toLowerCase().includes(keywordFilter)) {\n    priorityScore = Math.min(100, priorityScore + 20);\n    isHighPriority = true;\n  }\n\n  return {\n    json: {\n      ...cleaned,\n      recordId,\n      titleText,\n      itemUrl,\n      numericValue,\n      priorityScore,\n      isHighPriority,\n      alertSummary: titleText + ' (Metric: ' + numericValue + ' | Score: ' + priorityScore + '/100)',\n      scrapedAt: new Date().toISOString(),\n    },\n  };\n});"
       },
       "id": "87e5c1aa-483a-5212-a2a8-d036504afae6",
-      "name": "4. Clean & Score Items",
+      "name": "Normalize and Score Items",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -283,7 +314,7 @@
         "options": {}
       },
       "id": "32381648-0d8b-52f6-a9bb-86b7885c396c",
-      "name": "5. Map Export Fields",
+      "name": "Prepare Export Fields",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
@@ -303,7 +334,7 @@
         "sheetName": {
           "__rl": true,
           "mode": "name",
-          "value": "={{ $('1. Configure Search & Rules').first().json.sheetTab }}"
+          "value": "={{ $('Set Search Parameters').first().json.sheetTab }}"
         },
         "columns": {
           "mappingMode": "defineBelow",
@@ -434,7 +465,7 @@
         }
       },
       "id": "b1134542-c959-513d-99c1-eb11af1c2dbe",
-      "name": "6a. Log to Google Sheets",
+      "name": "Append Data to Sheets",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
@@ -450,7 +481,7 @@
         }
       },
       "id": "3616eaba-0568-568c-abf5-8a0b268faed9",
-      "name": "6b. Export Backup CSV",
+      "name": "Export to CSV File",
       "type": "n8n-nodes-base.convertToFile",
       "typeVersion": 1.1,
       "position": [
@@ -484,7 +515,7 @@
         "options": {}
       },
       "id": "102435ef-fdad-501e-8c68-bbb08005121d",
-      "name": "6c. Filter High-Priority Items",
+      "name": "Filter High-Priority Reviews",
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.2,
       "position": [
@@ -526,12 +557,12 @@
         }
       },
       "id": "45fe5c7f-3fdd-59e0-8748-cd85bdd35de3",
-      "name": "7. AI Review Triage & Response Drafter",
+      "name": "AI Review Triage and Response Drafter",
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
       "position": [
-        1660,
-        360
+        1712,
+        368
       ]
     },
     {
@@ -541,43 +572,43 @@
             {
               "id": "3bbad46a-b0b5-52f3-9717-6560084e3f8f",
               "name": "recordId",
-              "value": "={{ $('6c. Filter High-Priority Items').item.json.recordId }}",
+              "value": "={{ $('Filter High-Priority Reviews').item.json.recordId }}",
               "type": "string"
             },
             {
               "id": "041ed8cc-4f56-5128-8dd5-fcaadf2aaa01",
               "name": "titleText",
-              "value": "={{ $('6c. Filter High-Priority Items').item.json.titleText }}",
+              "value": "={{ $('Filter High-Priority Reviews').item.json.titleText }}",
               "type": "string"
             },
             {
               "id": "c06d88d2-c2b4-5663-b1f5-38df1884b0fd",
               "name": "itemUrl",
-              "value": "={{ $('6c. Filter High-Priority Items').item.json.itemUrl }}",
+              "value": "={{ $('Filter High-Priority Reviews').item.json.itemUrl }}",
               "type": "string"
             },
             {
               "id": "9f4d755d-51a1-57d4-b7f6-8440b839fa25",
               "name": "numericValue",
-              "value": "={{ $('6c. Filter High-Priority Items').item.json.numericValue }}",
+              "value": "={{ $('Filter High-Priority Reviews').item.json.numericValue }}",
               "type": "number"
             },
             {
               "id": "6f74a9c1-c038-5595-93b7-40bc2a369356",
               "name": "priorityScore",
-              "value": "={{ $('6c. Filter High-Priority Items').item.json.priorityScore }}",
+              "value": "={{ $('Filter High-Priority Reviews').item.json.priorityScore }}",
               "type": "number"
             },
             {
               "id": "ea2da59c-4244-575a-ba25-c84a7c9bcf88",
               "name": "recipientEmail",
-              "value": "={{ $('6c. Filter High-Priority Items').item.json.primary_email || '' }}",
+              "value": "={{ $('Filter High-Priority Reviews').item.json.primary_email || '' }}",
               "type": "string"
             },
             {
               "id": "d203b5fa-be40-5aec-82b7-d8f8bae10fff",
               "name": "aiHeadline",
-              "value": "={{ (typeof ($json.message && $json.message.content) === 'string' ? JSON.parse($json.message.content) : (($json.message && $json.message.content) || $json)).aiHeadline || $('6c. Filter High-Priority Items').item.json.titleText }}",
+              "value": "={{ (typeof ($json.message && $json.message.content) === 'string' ? JSON.parse($json.message.content) : (($json.message && $json.message.content) || $json)).aiHeadline || $('Filter High-Priority Reviews').item.json.titleText }}",
               "type": "string"
             },
             {
@@ -601,7 +632,7 @@
             {
               "id": "ef707c6a-be7d-543c-bcf8-a92aa9481a43",
               "name": "scrapedAt",
-              "value": "={{ $('6c. Filter High-Priority Items').item.json.scrapedAt }}",
+              "value": "={{ $('Filter High-Priority Reviews').item.json.scrapedAt }}",
               "type": "string"
             }
           ]
@@ -609,12 +640,12 @@
         "options": {}
       },
       "id": "36fa27ff-7e47-54e3-92bf-b482d8bfde13",
-      "name": "8. Merge AI Review Audit & Reply",
+      "name": "Merge Final Review Audit Fields",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1890,
-        360
+        1936,
+        368
       ]
     },
     {
@@ -641,12 +672,12 @@
         }
       },
       "id": "a1ca9bda-0185-55d7-8ce6-2d67c20f6442",
-      "name": "9a. Send ORM Review Alert to Slack",
+      "name": "Post ORM Alert to Slack Channel",
       "type": "n8n-nodes-base.slack",
       "typeVersion": 2.3,
       "position": [
-        2120,
-        260
+        2160,
+        256
       ]
     },
     {
@@ -664,124 +695,124 @@
         }
       },
       "id": "32228cff-f069-5ed2-988e-8ef7b01b8b82",
-      "name": "9b. Draft ORM Incident Report in Gmail",
+      "name": "Draft ORM Reply in Gmail",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        2120,
+        2160,
         480
       ]
     }
   ],
   "connections": {
-    "Every 6 Hours": {
+    "When Every 6 Hours": {
       "main": [
         [
           {
-            "node": "1. Configure Search & Rules",
+            "node": "Set Search Parameters",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "1. Configure Search & Rules": {
+    "Set Search Parameters": {
       "main": [
         [
           {
-            "node": "2. Run UnitBytes (google-maps-photos-scraper)",
+            "node": "Post to Google Maps Photos Scraper (Places, Menus & Local Guides) API",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "2. Run UnitBytes (google-maps-photos-scraper)": {
+    "Post to Google Maps Photos Scraper (Places, Menus & Local Guides) API": {
       "main": [
         [
           {
-            "node": "3. Skip Seen Records",
+            "node": "Deduplicate All Fields",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "3. Skip Seen Records": {
+    "Deduplicate All Fields": {
       "main": [
         [
           {
-            "node": "4. Clean & Score Items",
+            "node": "Normalize and Score Items",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "4. Clean & Score Items": {
+    "Normalize and Score Items": {
       "main": [
         [
           {
-            "node": "5. Map Export Fields",
+            "node": "Prepare Export Fields",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "5. Map Export Fields": {
+    "Prepare Export Fields": {
       "main": [
         [
           {
-            "node": "6a. Log to Google Sheets",
+            "node": "Append Data to Sheets",
             "type": "main",
             "index": 0
           },
           {
-            "node": "6b. Export Backup CSV",
+            "node": "Export to CSV File",
             "type": "main",
             "index": 0
           },
           {
-            "node": "6c. Filter High-Priority Items",
+            "node": "Filter High-Priority Reviews",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "6c. Filter High-Priority Items": {
+    "Filter High-Priority Reviews": {
       "main": [
         [
           {
-            "node": "7. AI Review Triage & Response Drafter",
+            "node": "AI Review Triage and Response Drafter",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "7. AI Review Triage & Response Drafter": {
+    "AI Review Triage and Response Drafter": {
       "main": [
         [
           {
-            "node": "8. Merge AI Review Audit & Reply",
+            "node": "Merge Final Review Audit Fields",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "8. Merge AI Review Audit & Reply": {
+    "Merge Final Review Audit Fields": {
       "main": [
         [
           {
-            "node": "9a. Send ORM Review Alert to Slack",
+            "node": "Post ORM Alert to Slack Channel",
             "type": "main",
             "index": 0
           },
           {
-            "node": "9b. Draft ORM Incident Report in Gmail",
+            "node": "Draft ORM Reply in Gmail",
             "type": "main",
             "index": 0
           }
