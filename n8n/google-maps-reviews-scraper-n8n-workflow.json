@@ -1,0 +1,817 @@
+{
+  "name": "Audit Google Maps reviews with OpenAI and route ORM replies to Gmail, Sheets, and Slack",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Google Maps Reviews Scraper — AI Co-Pilot & Multi-App Pipeline\n\nExtracts fresh data on a schedule with the **[google-maps-reviews-scraper Apify Actor](https://apify.com/unitbytes/google-maps-reviews-scraper?fpr=939u3w&fp_sid=n8n_io)** ($0.00035 / item), skips seen records, logs all rows to **Google Sheets** and **CSV**, and enriches top matches with **OpenAI (`gpt-4o-mini`)** for **Slack** and **Gmail**.\n\n### How it works\n1. **Every 6 Hours** loads rules from **1. Configure Search & Rules**.\n2. **2. Run UnitBytes (google-maps-reviews-scraper)** fetches data and **3. Skip Seen Records** deduplicates by `review_id`.\n3. **4. Clean & Score Items** and **5. Map Export Fields** normalize `place_name, reviewer_name, review_stars, review_text` and compute `priorityScore`.\n4. **6a. Log to Google Sheets** and **6b. Export Backup CSV** save all rows, while **6c. Filter High-Priority Items** routes top matches to **7. AI Review Triage & Response Drafter**.\n5. **8. Merge AI Review Audit & Reply** merges AI fields and triggers **9a. Send ORM Review Alert to Slack** and **9b. Draft ORM Incident Report in Gmail**.\n\n### Setup\n1. Add your token from [google-maps-reviews-scraper on Apify Store](https://apify.com/unitbytes/google-maps-reviews-scraper?fpr=939u3w&fp_sid=n8n_io) to the **HTTP Header Auth** credential on node 2 (`Name`: `Authorization`, `Value`: `Bearer <YOUR_APIFY_TOKEN>`).\n2. Edit `actorInput`, `sheetTab`, and `alertStarThreshold` in node 1.\n3. Connect **OpenAI**, **Google Sheets**, **Slack**, and **Gmail** credentials.\n\n### Customization\n- Adjust `alertStarThreshold` in node 1 or the prompt in node 7.\n- Docs: [https://unitbytes.com/actors/google-maps-reviews-scraper/](https://unitbytes.com/actors/google-maps-reviews-scraper/)",
+        "height": 780,
+        "width": 560,
+        "color": 1
+      },
+      "id": "ab5af5ed-3275-5e78-8042-568c76cea756",
+      "name": "Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 1. Schedule & Search Settings\nTriggers on schedule and sets target search parameters, Google Sheets tab, and alert thresholds.",
+        "height": 380,
+        "width": 440,
+        "color": 7
+      },
+      "id": "10d9780d-a5d0-5a64-bb00-7ad819fc5892",
+      "name": "Section 1 — Schedule & Settings",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 2. Extract & Deduplicate\nRuns the UnitBytes Apify Actor and skips records already processed in previous runs.",
+        "height": 380,
+        "width": 440,
+        "color": 7
+      },
+      "id": "8f078a87-80f7-5a95-a887-1a301a876fc9",
+      "name": "Section 2 — Extract & Deduplicate",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        460,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 3. Clean, Score & Flatten\nNormalizes fields, parses numeric metrics, and calculates a 0–100 priority score.",
+        "height": 380,
+        "width": 440,
+        "color": 7
+      },
+      "id": "2cc0c5dd-8752-5479-9677-a53ecc318a89",
+      "name": "Section 3 — Clean, Score & Flatten",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        920,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 4. Sheets, CSV & AI Co-Pilot\nLogs all rows to Sheets and CSV, enriches high-priority items with OpenAI, and alerts teams.",
+        "height": 740,
+        "width": 980,
+        "color": 7
+      },
+      "id": "bf4e7c43-bb67-51cf-864f-0d646b33af2b",
+      "name": "Section 4 — Sheets, CSV & AI Co-Pilot",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1380,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 6
+            }
+          ]
+        }
+      },
+      "id": "5137aced-107d-57c2-9142-fa3e3cd4656d",
+      "name": "Every 6 Hours",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        40,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "09d61739-8336-5f91-b2c4-d2e12a703b7c",
+              "name": "actorInput",
+              "value": "{\"reviewsToCheck\": [\"https://www.google.com/maps/place/Katz's+Delicatessen/@40.722233,-73.987429,17z/\"], \"reviewsSort\": \"newest\", \"language\": \"en\", \"region\": \"us\", \"maxReviewsPerPlace\": 5, \"maxPlacesPerQuery\": 1}",
+              "type": "object"
+            },
+            {
+              "id": "49087399-d9eb-5b75-b626-7d7b0a989fa9",
+              "name": "sheetTab",
+              "value": "ReviewMonitor",
+              "type": "string"
+            },
+            {
+              "id": "1ca2aa74-af33-580f-9fda-d1919d84f403",
+              "name": "alertStarThreshold",
+              "value": 2,
+              "type": "number"
+            },
+            {
+              "id": "745c7853-63cc-56c9-a5b6-90247ad9bf96",
+              "name": "priorityKeyword",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7f4ad24f-b0c2-522e-8ea1-b76f691a2ee2",
+      "name": "1. Configure Search & Rules",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        260,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/unitbytes~google-maps-reviews-scraper/run-sync-get-dataset-items?format=json&clean=true",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ typeof $json.actorInput === 'string' ? $json.actorInput : JSON.stringify($json.actorInput) }}",
+        "options": {
+          "timeout": 300000
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "58e4a8b3-3798-5837-9e9c-c5513711f4d1",
+          "name": "Apify API Token (Header Auth)"
+        }
+      },
+      "id": "e0e504bb-a5eb-5a0f-ad2d-a2a91388f375",
+      "name": "2. Run UnitBytes (google-maps-reviews-scraper)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        500,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "dedupeValue": "={{ $json.review_id || $json.review_url }}",
+        "options": {}
+      },
+      "id": "a652f8a2-3382-5748-84e3-e27331a790e4",
+      "name": "3. Skip Seen Records",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        720,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normalize fields, parse numeric metrics, and score items for AI enrichment\nconst config = $('1. Configure Search & Rules').first().json;\nconst threshold = Number(config.alertStarThreshold !== undefined ? config.alertStarThreshold : 2);\nconst keywordFilter = String(config.priorityKeyword || '').trim().toLowerCase();\nconst primaryKeys = [\"place_name\", \"reviewer_name\", \"review_stars\", \"review_text\", \"published_at\", \"review_url\"];\n\nreturn $input.all().map((item) => {\n  const raw = item.json || {};\n  const cleaned = { ...raw };\n\n  for (const k of primaryKeys) {\n    if (typeof cleaned[k] === 'string') {\n      cleaned[k] = cleaned[k].replace(/\\s+/g, ' ').trim();\n    }\n  }\n\n  const recordId = String(cleaned.review_id || cleaned.id || cleaned.url || '');\n  const titleText = String(cleaned.business_name || cleaned.place_name || cleaned.reviewer_name || recordId).slice(0, 180);\n  const itemUrl = String(cleaned.review_url || '');\n  const rawMetric = cleaned.review_stars || cleaned.reviewRating || cleaned.stars || cleaned.rating || 0;\n  const numericValue = Number(String(rawMetric).replace(/[^0-9.-]/g, '')) || 0;\n\n  let priorityScore = 50;\n  let isHighPriority = false;\n\n  const stars = Number(cleaned.review_stars || cleaned.reviewRating || cleaned.stars || cleaned.rating || numericValue);\n  if (cleaned.is_removed === true || cleaned.is_edited === true || cleaned.status === 'REMOVED' || (stars > 0 && stars <= threshold)) {\n    priorityScore = 95;\n    isHighPriority = true;\n  }\n\n  if (keywordFilter && titleText.toLowerCase().includes(keywordFilter)) {\n    priorityScore = Math.min(100, priorityScore + 20);\n    isHighPriority = true;\n  }\n\n  return {\n    json: {\n      ...cleaned,\n      recordId,\n      titleText,\n      itemUrl,\n      numericValue,\n      priorityScore,\n      isHighPriority,\n      alertSummary: titleText + ' (Metric: ' + numericValue + ' | Score: ' + priorityScore + '/100)',\n      scrapedAt: new Date().toISOString(),\n    },\n  };\n});"
+      },
+      "id": "92ce9502-dded-5cda-a7f1-75bae705fd55",
+      "name": "4. Clean & Score Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bd3db57d-e162-50cc-8fe8-66ac98480593",
+              "name": "place_name",
+              "value": "={{ $json.place_name !== undefined && $json.place_name !== null ? $json.place_name : '' }}",
+              "type": "string"
+            },
+            {
+              "id": "b418c4b3-eac9-57f8-bbd0-e3421512e101",
+              "name": "reviewer_name",
+              "value": "={{ $json.reviewer_name !== undefined && $json.reviewer_name !== null ? $json.reviewer_name : '' }}",
+              "type": "string"
+            },
+            {
+              "id": "8c61272e-6aa4-5b25-82e4-6e92702bba77",
+              "name": "review_stars",
+              "value": "={{ $json.review_stars !== undefined && $json.review_stars !== null ? $json.review_stars : '' }}",
+              "type": "string"
+            },
+            {
+              "id": "9e395d6e-2f9b-5707-8a61-7d76e0304eb0",
+              "name": "review_text",
+              "value": "={{ $json.review_text !== undefined && $json.review_text !== null ? $json.review_text : '' }}",
+              "type": "string"
+            },
+            {
+              "id": "7cb80bff-e8bd-50b3-952f-57370a41d450",
+              "name": "published_at",
+              "value": "={{ $json.published_at !== undefined && $json.published_at !== null ? $json.published_at : '' }}",
+              "type": "string"
+            },
+            {
+              "id": "3400e116-a572-50dc-a73b-2e71547bd52d",
+              "name": "review_url",
+              "value": "={{ $json.review_url !== undefined && $json.review_url !== null ? $json.review_url : '' }}",
+              "type": "string"
+            },
+            {
+              "id": "0851b8cf-9743-5734-b114-63d9bc29adc6",
+              "name": "numericValue",
+              "value": "={{ Number($json.numericValue || 0) }}",
+              "type": "number"
+            },
+            {
+              "id": "369f5e5d-f440-529b-8219-b90d71bdd286",
+              "name": "priorityScore",
+              "value": "={{ Number($json.priorityScore || 0) }}",
+              "type": "number"
+            },
+            {
+              "id": "efb3c227-9c46-59bf-916b-11dd949ca838",
+              "name": "isHighPriority",
+              "value": "={{ Boolean($json.isHighPriority) }}",
+              "type": "boolean"
+            },
+            {
+              "id": "f2cfd0ba-58f7-52af-abc5-24ecf6576071",
+              "name": "alertSummary",
+              "value": "={{ $json.alertSummary !== undefined && $json.alertSummary !== null ? $json.alertSummary : '' }}",
+              "type": "string"
+            },
+            {
+              "id": "35bb5756-6f1d-52a9-a341-6d13242cf760",
+              "name": "scrapedAt",
+              "value": "={{ $json.scrapedAt !== undefined && $json.scrapedAt !== null ? $json.scrapedAt : '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "1efa2251-1e40-5a8c-9f59-f3dc92049789",
+      "name": "5. Map Export Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1180,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "={{ $('1. Configure Search & Rules').first().json.sheetTab }}"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "place_name": "={{ $json.place_name !== undefined && $json.place_name !== null ? $json.place_name : '' }}",
+            "reviewer_name": "={{ $json.reviewer_name !== undefined && $json.reviewer_name !== null ? $json.reviewer_name : '' }}",
+            "review_stars": "={{ $json.review_stars !== undefined && $json.review_stars !== null ? $json.review_stars : '' }}",
+            "review_text": "={{ $json.review_text !== undefined && $json.review_text !== null ? $json.review_text : '' }}",
+            "published_at": "={{ $json.published_at !== undefined && $json.published_at !== null ? $json.published_at : '' }}",
+            "review_url": "={{ $json.review_url !== undefined && $json.review_url !== null ? $json.review_url : '' }}",
+            "numericValue": "={{ $json.numericValue !== undefined && $json.numericValue !== null ? $json.numericValue : '' }}",
+            "priorityScore": "={{ $json.priorityScore !== undefined && $json.priorityScore !== null ? $json.priorityScore : '' }}",
+            "isHighPriority": "={{ $json.isHighPriority !== undefined && $json.isHighPriority !== null ? $json.isHighPriority : '' }}",
+            "alertSummary": "={{ $json.alertSummary !== undefined && $json.alertSummary !== null ? $json.alertSummary : '' }}",
+            "scrapedAt": "={{ $json.scrapedAt !== undefined && $json.scrapedAt !== null ? $json.scrapedAt : '' }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "place_name",
+              "displayName": "place_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reviewer_name",
+              "displayName": "reviewer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "review_stars",
+              "displayName": "review_stars",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "review_text",
+              "displayName": "review_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "published_at",
+              "displayName": "published_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "review_url",
+              "displayName": "review_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "numericValue",
+              "displayName": "numericValue",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "priorityScore",
+              "displayName": "priorityScore",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "isHighPriority",
+              "displayName": "isHighPriority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "alertSummary",
+              "displayName": "alertSummary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "scrapedAt",
+              "displayName": "scrapedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "RAW"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "392f8733-93e7-5818-aa0c-b1fd35cc5d9c",
+          "name": "Google Sheets account"
+        }
+      },
+      "id": "3bbb2aa2-b246-5011-bdad-dd94ab62521b",
+      "name": "6a. Log to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1440,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "csv",
+        "options": {
+          "fileName": "google-maps-reviews-scraper-dataset-export.csv"
+        }
+      },
+      "id": "9e273dba-3fc8-5ac6-b9a5-e268efd858bf",
+      "name": "6b. Export Backup CSV",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1440,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c12454dc-a399-5921-b454-8d22ce2a93c3",
+              "leftValue": "={{ $json.isHighPriority }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "956c4e31-0770-5013-8d53-eae58c70139b",
+      "name": "6c. Filter High-Priority Items",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1440,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "text",
+        "operation": "message",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are an Online Reputation Management (ORM) specialist. Analyze the scraped Google Maps review or contributor record and return a JSON object with exactly 4 keys: \"aiHeadline\" (place name + star rating + review status summary), \"aiVerdict\" (one of: CRITICAL_DISPUTE, REMOVAL_CONFIRMED, NEEDS_OWNER_REPLY, POSITIVE_HIGHLIGHT), \"aiAnalysis\" (1-sentence root-cause diagnosis and check for Google Content Policy spam/conflict violations), and \"aiDraftBody\" (an empathetic, brand-safe public owner response ready to post, or client status update if removed).",
+              "role": "system"
+            },
+            {
+              "content": "=Review Record ({{ $json.recordId }}):\nPlace / Reviewer: {{ $json.titleText }}\nStar Rating / Metric: {{ $json.numericValue }} (Priority: {{ $json.priorityScore }}/100)\nURL: {{ $json.itemUrl }}\nRaw Payload Summary: {{ JSON.stringify($json).slice(0, 1200) }}",
+              "role": "user"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "38607d58-01f6-572b-ab8d-7565c1d5beff",
+          "name": "OpenAI account"
+        }
+      },
+      "id": "90eff8c2-65bb-55f3-b6b0-7e9135b3728d",
+      "name": "7. AI Review Triage & Response Drafter",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1660,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0cf65e6e-b19c-5a16-8454-57d421965be0",
+              "name": "recordId",
+              "value": "={{ $('6c. Filter High-Priority Items').item.json.recordId }}",
+              "type": "string"
+            },
+            {
+              "id": "e470342f-3f3d-58bb-a3e2-99a67b0e894e",
+              "name": "titleText",
+              "value": "={{ $('6c. Filter High-Priority Items').item.json.titleText }}",
+              "type": "string"
+            },
+            {
+              "id": "ece21df4-8646-5805-8cf1-26269d7d7cc4",
+              "name": "itemUrl",
+              "value": "={{ $('6c. Filter High-Priority Items').item.json.itemUrl }}",
+              "type": "string"
+            },
+            {
+              "id": "493114e1-b900-5292-86ed-0a23ac4742b4",
+              "name": "numericValue",
+              "value": "={{ $('6c. Filter High-Priority Items').item.json.numericValue }}",
+              "type": "number"
+            },
+            {
+              "id": "6d010dca-7de9-5728-9cce-dab34c15a0c8",
+              "name": "priorityScore",
+              "value": "={{ $('6c. Filter High-Priority Items').item.json.priorityScore }}",
+              "type": "number"
+            },
+            {
+              "id": "67c16ba2-5d18-5a84-b7d5-004c7dd00e76",
+              "name": "recipientEmail",
+              "value": "={{ $('6c. Filter High-Priority Items').item.json.primary_email || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "c83b808c-b9cc-5ee2-80f0-6277d3014d23",
+              "name": "aiHeadline",
+              "value": "={{ (typeof ($json.message && $json.message.content) === 'string' ? JSON.parse($json.message.content) : (($json.message && $json.message.content) || $json)).aiHeadline || $('6c. Filter High-Priority Items').item.json.titleText }}",
+              "type": "string"
+            },
+            {
+              "id": "83572245-34ef-53ee-b12f-cee76de7af66",
+              "name": "aiVerdict",
+              "value": "={{ (typeof ($json.message && $json.message.content) === 'string' ? JSON.parse($json.message.content) : (($json.message && $json.message.content) || $json)).aiVerdict || 'HIGH_PRIORITY' }}",
+              "type": "string"
+            },
+            {
+              "id": "14b73d49-635f-56f1-9939-6d20e6f96757",
+              "name": "aiAnalysis",
+              "value": "={{ (typeof ($json.message && $json.message.content) === 'string' ? JSON.parse($json.message.content) : (($json.message && $json.message.content) || $json)).aiAnalysis || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "3553b922-d920-5e2a-a1b2-42918b513113",
+              "name": "aiDraftBody",
+              "value": "={{ (typeof ($json.message && $json.message.content) === 'string' ? JSON.parse($json.message.content) : (($json.message && $json.message.content) || $json)).aiDraftBody || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "6386ec5b-741d-59b8-91e3-4552c6a20c90",
+              "name": "scrapedAt",
+              "value": "={{ $('6c. Filter High-Priority Items').item.json.scrapedAt }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a82bec36-d210-54bf-b41f-1b9d28cdb066",
+      "name": "8. Merge AI Review Audit & Reply",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1890,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "post",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "messageType": "text",
+        "text": "=:robot_face: *AI Co-Pilot Match (Google Maps Reviews Scraper)*\n*<{{ $json.itemUrl }}|{{ $json.aiHeadline }}>*\n• *AI Verdict:* `{{ $json.aiVerdict }}` | *Priority Score:* {{ $json.priorityScore }}/100 (Metric: {{ $json.numericValue }})\n• *AI Analysis:* {{ $json.aiAnalysis }}\n• *Suggested Action / Draft:* {{ $json.aiDraftBody }}\n• *Record ID:* `{{ $json.recordId }}`",
+        "otherOptions": {
+          "includeLinkToWorkflow": false,
+          "unfurl_links": false
+        }
+      },
+      "credentials": {
+        "slackApi": {
+          "id": "6c67b0db-bde1-5e74-9d67-b43b6bfdb500",
+          "name": "Slack account"
+        }
+      },
+      "id": "64a830dd-d2a4-5b98-ad91-ca15fc8de25a",
+      "name": "9a. Send ORM Review Alert to Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        2120,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "operation": "create",
+        "subject": "=[AI Action] {{ $json.aiVerdict }}: {{ $json.aiHeadline }}",
+        "message": "={{ $json.aiDraftBody }}\n\n---\nAI Analysis: {{ $json.aiAnalysis }}\nSource Link: {{ $json.itemUrl }}\nPriority Score: {{ $json.priorityScore }}/100",
+        "options": {}
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "3f9501e5-e668-5a63-9b3e-2969fb1a7175",
+          "name": "Gmail account"
+        }
+      },
+      "id": "285e9097-1bfc-5d40-85e5-fae5646f4d40",
+      "name": "9b. Draft ORM Incident Report in Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2120,
+        480
+      ]
+    }
+  ],
+  "connections": {
+    "Every 6 Hours": {
+      "main": [
+        [
+          {
+            "node": "1. Configure Search & Rules",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1. Configure Search & Rules": {
+      "main": [
+        [
+          {
+            "node": "2. Run UnitBytes (google-maps-reviews-scraper)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2. Run UnitBytes (google-maps-reviews-scraper)": {
+      "main": [
+        [
+          {
+            "node": "3. Skip Seen Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "3. Skip Seen Records": {
+      "main": [
+        [
+          {
+            "node": "4. Clean & Score Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4. Clean & Score Items": {
+      "main": [
+        [
+          {
+            "node": "5. Map Export Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "5. Map Export Fields": {
+      "main": [
+        [
+          {
+            "node": "6a. Log to Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "6b. Export Backup CSV",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "6c. Filter High-Priority Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "6c. Filter High-Priority Items": {
+      "main": [
+        [
+          {
+            "node": "7. AI Review Triage & Response Drafter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "7. AI Review Triage & Response Drafter": {
+      "main": [
+        [
+          {
+            "node": "8. Merge AI Review Audit & Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "8. Merge AI Review Audit & Reply": {
+      "main": [
+        [
+          {
+            "node": "9a. Send ORM Review Alert to Slack",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "9b. Draft ORM Incident Report in Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "030f9420-0ca8-5240-8fe8-208e287a8b19"
+  },
+  "tags": [
+    {
+      "name": "AI"
+    },
+    {
+      "name": "OpenAI"
+    },
+    {
+      "name": "Web Scraping"
+    },
+    {
+      "name": "Apify"
+    },
+    {
+      "name": "Reputation Intelligence"
+    }
+  ]
+}

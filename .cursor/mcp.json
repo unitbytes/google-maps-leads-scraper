@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "unitbytes-apify": {
+      "type": "http",
+      "url": "https://mcp.apify.com/?tools=actors,docs,unitbytes/google-maps-leads-scraper,unitbytes/google-maps-reviews-scraper,unitbytes/google-maps-reviews-tracker,unitbytes/google-maps-contributor-scraper,unitbytes/google-maps-photos-scraper"
+    }
+  }
+}

@@ -1,0 +1,817 @@
+{
+  "name": "Audit Google Maps venue photos with OpenAI to Google Sheets, Gmail, and Slack",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Google Maps Photos Scraper (Places, Menus & Local Guides) — AI Co-Pilot & Multi-App Pipeline\n\nExtracts fresh data on a schedule with the **[google-maps-photos-scraper Apify Actor](https://apify.com/unitbytes/google-maps-photos-scraper?fpr=939u3w&fp_sid=n8n_io)** ($0.0015 / item), skips seen records, logs all rows to **Google Sheets** and **CSV**, and enriches top matches with **OpenAI (`gpt-4o-mini`)** for **Slack** and **Gmail**.\n\n### How it works\n1. **Every 6 Hours** loads rules from **1. Configure Search & Rules**.\n2. **2. Run UnitBytes (google-maps-photos-scraper)** fetches data and **3. Skip Seen Records** deduplicates by `photoId`.\n3. **4. Clean & Score Items** and **5. Map Export Fields** normalize `placeName, photoUrl, photoUrlHighRes, category` and compute `priorityScore`.\n4. **6a. Log to Google Sheets** and **6b. Export Backup CSV** save all rows, while **6c. Filter High-Priority Items** routes top matches to **7. AI Review Triage & Response Drafter**.\n5. **8. Merge AI Review Audit & Reply** merges AI fields and triggers **9a. Send ORM Review Alert to Slack** and **9b. Draft ORM Incident Report in Gmail**.\n\n### Setup\n1. Add your token from [google-maps-photos-scraper on Apify Store](https://apify.com/unitbytes/google-maps-photos-scraper?fpr=939u3w&fp_sid=n8n_io) to the **HTTP Header Auth** credential on node 2 (`Name`: `Authorization`, `Value`: `Bearer <YOUR_APIFY_TOKEN>`).\n2. Edit `actorInput`, `sheetTab`, and `minGuideLevel` in node 1.\n3. Connect **OpenAI**, **Google Sheets**, **Slack**, and **Gmail** credentials.\n\n### Customization\n- Adjust `minGuideLevel` in node 1 or the prompt in node 7.\n- Docs: [https://unitbytes.com/actors/google-maps-photos-scraper/](https://unitbytes.com/actors/google-maps-photos-scraper/)",
+        "height": 780,
+        "width": 560,
+        "color": 1
+      },
+      "id": "efc4a408-fe73-54fb-9fb2-7ac00142d274",
+      "name": "Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 1. Schedule & Search Settings\nTriggers on schedule and sets target search parameters, Google Sheets tab, and alert thresholds.",
+        "height": 380,
+        "width": 440,
+        "color": 7
+      },
+      "id": "a16452c0-639d-5d3f-98c9-b3f5f41cb7bb",
+      "name": "Section 1 — Schedule & Settings",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 2. Extract & Deduplicate\nRuns the UnitBytes Apify Actor and skips records already processed in previous runs.",
+        "height": 380,
+        "width": 440,
+        "color": 7
+      },
+      "id": "7b709ab5-7ad9-5c71-8b33-6df2a14e8342",
+      "name": "Section 2 — Extract & Deduplicate",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        460,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 3. Clean, Score & Flatten\nNormalizes fields, parses numeric metrics, and calculates a 0–100 priority score.",
+        "height": 380,
+        "width": 440,
+        "color": 7
+      },
+      "id": "060d0846-cb20-5648-8959-0cb2b0a9a126",
+      "name": "Section 3 — Clean, Score & Flatten",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        920,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 4. Sheets, CSV & AI Co-Pilot\nLogs all rows to Sheets and CSV, enriches high-priority items with OpenAI, and alerts teams.",
+        "height": 740,
+        "width": 980,
+        "color": 7
+      },
+      "id": "e094f512-11fd-5d48-ac52-98005ed6e108",
+      "name": "Section 4 — Sheets, CSV & AI Co-Pilot",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1380,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 6
+            }
+          ]
+        }
+      },
+      "id": "5a6fb517-d6c7-5f8c-8055-f7381eb29f8e",
+      "name": "Every 6 Hours",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        40,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "87a7ce46-860b-5e23-8003-885cadc8f9a3",
+              "name": "actorInput",
+              "value": "{\"placeUrls\": [\"https://www.google.com/maps/place/Katz's+Delicatessen/@40.722233,-73.987429,17z/\"], \"maxPhotos\": 50, \"maxPlacesPerSearch\": 1, \"highResOnly\": true, \"scrapePhotos\": true}",
+              "type": "object"
+            },
+            {
+              "id": "4515493c-57b2-57d3-bc84-ddcdd87a285a",
+              "name": "sheetTab",
+              "value": "PlacePhotos",
+              "type": "string"
+            },
+            {
+              "id": "79c9a466-081e-5604-b73d-2733e622dd66",
+              "name": "minGuideLevel",
+              "value": 4,
+              "type": "number"
+            },
+            {
+              "id": "0014c9f8-9615-5e77-9694-f51e3ed1db59",
+              "name": "priorityKeyword",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e6e18fb1-bb16-56e9-95aa-9a7eb298b439",
+      "name": "1. Configure Search & Rules",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        260,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/unitbytes~google-maps-photos-scraper/run-sync-get-dataset-items?format=json&clean=true",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ typeof $json.actorInput === 'string' ? $json.actorInput : JSON.stringify($json.actorInput) }}",
+        "options": {
+          "timeout": 300000
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "58e4a8b3-3798-5837-9e9c-c5513711f4d1",
+          "name": "Apify API Token (Header Auth)"
+        }
+      },
+      "id": "a2e7645f-8dec-588b-b9c2-87bd8f1822bb",
+      "name": "2. Run UnitBytes (google-maps-photos-scraper)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        500,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "dedupeValue": "={{ $json.photoId || $json.photoUrl }}",
+        "options": {}
+      },
+      "id": "588831a6-0885-5192-887c-0268a405ce87",
+      "name": "3. Skip Seen Records",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        720,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normalize fields, parse numeric metrics, and score items for AI enrichment\nconst config = $('1. Configure Search & Rules').first().json;\nconst threshold = Number(config.minGuideLevel !== undefined ? config.minGuideLevel : 4);\nconst keywordFilter = String(config.priorityKeyword || '').trim().toLowerCase();\nconst primaryKeys = [\"placeName\", \"photoUrl\", \"photoUrlHighRes\", \"category\", \"name\", \"placeRating\"];\n\nreturn $input.all().map((item) => {\n  const raw = item.json || {};\n  const cleaned = { ...raw };\n\n  for (const k of primaryKeys) {\n    if (typeof cleaned[k] === 'string') {\n      cleaned[k] = cleaned[k].replace(/\\s+/g, ' ').trim();\n    }\n  }\n\n  const recordId = String(cleaned.photoId || cleaned.id || cleaned.url || '');\n  const titleText = String(cleaned.placeName || cleaned.name || recordId).slice(0, 180);\n  const itemUrl = String(cleaned.photoUrl || '');\n  const rawMetric = cleaned.localGuideLevel || cleaned.placeRating || 0;\n  const numericValue = Number(String(rawMetric).replace(/[^0-9.-]/g, '')) || 0;\n\n  let priorityScore = 50;\n  let isHighPriority = false;\n\n  if (numericValue >= threshold) {\n    priorityScore = Math.min(100, Math.round(70 + Math.min(numericValue / Math.max(threshold, 1), 3) * 10));\n    isHighPriority = true;\n  }\n\n  if (keywordFilter && titleText.toLowerCase().includes(keywordFilter)) {\n    priorityScore = Math.min(100, priorityScore + 20);\n    isHighPriority = true;\n  }\n\n  return {\n    json: {\n      ...cleaned,\n      recordId,\n      titleText,\n      itemUrl,\n      numericValue,\n      priorityScore,\n      isHighPriority,\n      alertSummary: titleText + ' (Metric: ' + numericValue + ' | Score: ' + priorityScore + '/100)',\n      scrapedAt: new Date().toISOString(),\n    },\n  };\n});"
+      },
+      "id": "87e5c1aa-483a-5212-a2a8-d036504afae6",
+      "name": "4. Clean & Score Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "56b1432d-2846-562b-833c-4088962586c1",
+              "name": "placeName",
+              "value": "={{ $json.placeName !== undefined && $json.placeName !== null ? $json.placeName : '' }}",
+              "type": "string"
+            },
+            {
+              "id": "9291b105-39c5-5ab5-8167-d4de73bec75b",
+              "name": "photoUrl",
+              "value": "={{ $json.photoUrl !== undefined && $json.photoUrl !== null ? $json.photoUrl : '' }}",
+              "type": "string"
+            },
+            {
+              "id": "15bd2fdc-67a3-5929-9d02-4e7b74b27c65",
+              "name": "photoUrlHighRes",
+              "value": "={{ $json.photoUrlHighRes !== undefined && $json.photoUrlHighRes !== null ? $json.photoUrlHighRes : '' }}",
+              "type": "string"
+            },
+            {
+              "id": "5ed5278f-3a2e-54e7-aa7a-bcd5cdbc8db9",
+              "name": "category",
+              "value": "={{ $json.category !== undefined && $json.category !== null ? $json.category : '' }}",
+              "type": "string"
+            },
+            {
+              "id": "17c484f7-9997-544d-a472-190893bdafb0",
+              "name": "name",
+              "value": "={{ $json.name !== undefined && $json.name !== null ? $json.name : '' }}",
+              "type": "string"
+            },
+            {
+              "id": "a5030dcd-bfd8-5267-945c-98a3bd5b25d8",
+              "name": "placeRating",
+              "value": "={{ $json.placeRating !== undefined && $json.placeRating !== null ? $json.placeRating : '' }}",
+              "type": "string"
+            },
+            {
+              "id": "87681b93-7102-56ce-aa11-a2d6e39adf32",
+              "name": "numericValue",
+              "value": "={{ Number($json.numericValue || 0) }}",
+              "type": "number"
+            },
+            {
+              "id": "ec541b8f-d8c6-5b91-9000-d51d0f684994",
+              "name": "priorityScore",
+              "value": "={{ Number($json.priorityScore || 0) }}",
+              "type": "number"
+            },
+            {
+              "id": "384195ec-5e4e-5f3d-a667-ae68c64d6602",
+              "name": "isHighPriority",
+              "value": "={{ Boolean($json.isHighPriority) }}",
+              "type": "boolean"
+            },
+            {
+              "id": "383998e8-c835-5ef2-b1c4-fa0400245a80",
+              "name": "alertSummary",
+              "value": "={{ $json.alertSummary !== undefined && $json.alertSummary !== null ? $json.alertSummary : '' }}",
+              "type": "string"
+            },
+            {
+              "id": "ab4a77bc-fe09-5304-96f8-ef5b2ec23855",
+              "name": "scrapedAt",
+              "value": "={{ $json.scrapedAt !== undefined && $json.scrapedAt !== null ? $json.scrapedAt : '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "32381648-0d8b-52f6-a9bb-86b7885c396c",
+      "name": "5. Map Export Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1180,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "={{ $('1. Configure Search & Rules').first().json.sheetTab }}"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "placeName": "={{ $json.placeName !== undefined && $json.placeName !== null ? $json.placeName : '' }}",
+            "photoUrl": "={{ $json.photoUrl !== undefined && $json.photoUrl !== null ? $json.photoUrl : '' }}",
+            "photoUrlHighRes": "={{ $json.photoUrlHighRes !== undefined && $json.photoUrlHighRes !== null ? $json.photoUrlHighRes : '' }}",
+            "category": "={{ $json.category !== undefined && $json.category !== null ? $json.category : '' }}",
+            "name": "={{ $json.name !== undefined && $json.name !== null ? $json.name : '' }}",
+            "placeRating": "={{ $json.placeRating !== undefined && $json.placeRating !== null ? $json.placeRating : '' }}",
+            "numericValue": "={{ $json.numericValue !== undefined && $json.numericValue !== null ? $json.numericValue : '' }}",
+            "priorityScore": "={{ $json.priorityScore !== undefined && $json.priorityScore !== null ? $json.priorityScore : '' }}",
+            "isHighPriority": "={{ $json.isHighPriority !== undefined && $json.isHighPriority !== null ? $json.isHighPriority : '' }}",
+            "alertSummary": "={{ $json.alertSummary !== undefined && $json.alertSummary !== null ? $json.alertSummary : '' }}",
+            "scrapedAt": "={{ $json.scrapedAt !== undefined && $json.scrapedAt !== null ? $json.scrapedAt : '' }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "placeName",
+              "displayName": "placeName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "photoUrl",
+              "displayName": "photoUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "photoUrlHighRes",
+              "displayName": "photoUrlHighRes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "placeRating",
+              "displayName": "placeRating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "numericValue",
+              "displayName": "numericValue",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "priorityScore",
+              "displayName": "priorityScore",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "isHighPriority",
+              "displayName": "isHighPriority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "alertSummary",
+              "displayName": "alertSummary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "scrapedAt",
+              "displayName": "scrapedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "RAW"
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "392f8733-93e7-5818-aa0c-b1fd35cc5d9c",
+          "name": "Google Sheets account"
+        }
+      },
+      "id": "b1134542-c959-513d-99c1-eb11af1c2dbe",
+      "name": "6a. Log to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1440,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "csv",
+        "options": {
+          "fileName": "google-maps-photos-scraper-dataset-export.csv"
+        }
+      },
+      "id": "3616eaba-0568-568c-abf5-8a0b268faed9",
+      "name": "6b. Export Backup CSV",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1440,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "00d41f01-1ea3-5240-b60c-25dacbe8d0db",
+              "leftValue": "={{ $json.isHighPriority }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "102435ef-fdad-501e-8c68-bbb08005121d",
+      "name": "6c. Filter High-Priority Items",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1440,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "text",
+        "operation": "message",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are an Online Reputation Management (ORM) specialist. Analyze the scraped Google Maps review or contributor record and return a JSON object with exactly 4 keys: \"aiHeadline\" (place name + star rating + review status summary), \"aiVerdict\" (one of: CRITICAL_DISPUTE, REMOVAL_CONFIRMED, NEEDS_OWNER_REPLY, POSITIVE_HIGHLIGHT), \"aiAnalysis\" (1-sentence root-cause diagnosis and check for Google Content Policy spam/conflict violations), and \"aiDraftBody\" (an empathetic, brand-safe public owner response ready to post, or client status update if removed).",
+              "role": "system"
+            },
+            {
+              "content": "=Review Record ({{ $json.recordId }}):\nPlace / Reviewer: {{ $json.titleText }}\nStar Rating / Metric: {{ $json.numericValue }} (Priority: {{ $json.priorityScore }}/100)\nURL: {{ $json.itemUrl }}\nRaw Payload Summary: {{ JSON.stringify($json).slice(0, 1200) }}",
+              "role": "user"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "38607d58-01f6-572b-ab8d-7565c1d5beff",
+          "name": "OpenAI account"
+        }
+      },
+      "id": "45fe5c7f-3fdd-59e0-8748-cd85bdd35de3",
+      "name": "7. AI Review Triage & Response Drafter",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1660,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3bbad46a-b0b5-52f3-9717-6560084e3f8f",
+              "name": "recordId",
+              "value": "={{ $('6c. Filter High-Priority Items').item.json.recordId }}",
+              "type": "string"
+            },
+            {
+              "id": "041ed8cc-4f56-5128-8dd5-fcaadf2aaa01",
+              "name": "titleText",
+              "value": "={{ $('6c. Filter High-Priority Items').item.json.titleText }}",
+              "type": "string"
+            },
+            {
+              "id": "c06d88d2-c2b4-5663-b1f5-38df1884b0fd",
+              "name": "itemUrl",
+              "value": "={{ $('6c. Filter High-Priority Items').item.json.itemUrl }}",
+              "type": "string"
+            },
+            {
+              "id": "9f4d755d-51a1-57d4-b7f6-8440b839fa25",
+              "name": "numericValue",
+              "value": "={{ $('6c. Filter High-Priority Items').item.json.numericValue }}",
+              "type": "number"
+            },
+            {
+              "id": "6f74a9c1-c038-5595-93b7-40bc2a369356",
+              "name": "priorityScore",
+              "value": "={{ $('6c. Filter High-Priority Items').item.json.priorityScore }}",
+              "type": "number"
+            },
+            {
+              "id": "ea2da59c-4244-575a-ba25-c84a7c9bcf88",
+              "name": "recipientEmail",
+              "value": "={{ $('6c. Filter High-Priority Items').item.json.primary_email || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "d203b5fa-be40-5aec-82b7-d8f8bae10fff",
+              "name": "aiHeadline",
+              "value": "={{ (typeof ($json.message && $json.message.content) === 'string' ? JSON.parse($json.message.content) : (($json.message && $json.message.content) || $json)).aiHeadline || $('6c. Filter High-Priority Items').item.json.titleText }}",
+              "type": "string"
+            },
+            {
+              "id": "8085f223-628d-5271-969c-03e5ba489565",
+              "name": "aiVerdict",
+              "value": "={{ (typeof ($json.message && $json.message.content) === 'string' ? JSON.parse($json.message.content) : (($json.message && $json.message.content) || $json)).aiVerdict || 'HIGH_PRIORITY' }}",
+              "type": "string"
+            },
+            {
+              "id": "8f861579-c94e-50c6-a76d-1296cbe7f758",
+              "name": "aiAnalysis",
+              "value": "={{ (typeof ($json.message && $json.message.content) === 'string' ? JSON.parse($json.message.content) : (($json.message && $json.message.content) || $json)).aiAnalysis || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "86328be9-ab3a-5041-b503-bade563753d7",
+              "name": "aiDraftBody",
+              "value": "={{ (typeof ($json.message && $json.message.content) === 'string' ? JSON.parse($json.message.content) : (($json.message && $json.message.content) || $json)).aiDraftBody || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "ef707c6a-be7d-543c-bcf8-a92aa9481a43",
+              "name": "scrapedAt",
+              "value": "={{ $('6c. Filter High-Priority Items').item.json.scrapedAt }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "36fa27ff-7e47-54e3-92bf-b482d8bfde13",
+      "name": "8. Merge AI Review Audit & Reply",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1890,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "post",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "messageType": "text",
+        "text": "=:robot_face: *AI Co-Pilot Match (Google Maps Photos Scraper (Places, Menus & Local Guides))*\n*<{{ $json.itemUrl }}|{{ $json.aiHeadline }}>*\n• *AI Verdict:* `{{ $json.aiVerdict }}` | *Priority Score:* {{ $json.priorityScore }}/100 (Metric: {{ $json.numericValue }})\n• *AI Analysis:* {{ $json.aiAnalysis }}\n• *Suggested Action / Draft:* {{ $json.aiDraftBody }}\n• *Record ID:* `{{ $json.recordId }}`",
+        "otherOptions": {
+          "includeLinkToWorkflow": false,
+          "unfurl_links": false
+        }
+      },
+      "credentials": {
+        "slackApi": {
+          "id": "6c67b0db-bde1-5e74-9d67-b43b6bfdb500",
+          "name": "Slack account"
+        }
+      },
+      "id": "a1ca9bda-0185-55d7-8ce6-2d67c20f6442",
+      "name": "9a. Send ORM Review Alert to Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        2120,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "operation": "create",
+        "subject": "=[AI Action] {{ $json.aiVerdict }}: {{ $json.aiHeadline }}",
+        "message": "={{ $json.aiDraftBody }}\n\n---\nAI Analysis: {{ $json.aiAnalysis }}\nSource Link: {{ $json.itemUrl }}\nPriority Score: {{ $json.priorityScore }}/100",
+        "options": {}
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "3f9501e5-e668-5a63-9b3e-2969fb1a7175",
+          "name": "Gmail account"
+        }
+      },
+      "id": "32228cff-f069-5ed2-988e-8ef7b01b8b82",
+      "name": "9b. Draft ORM Incident Report in Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2120,
+        480
+      ]
+    }
+  ],
+  "connections": {
+    "Every 6 Hours": {
+      "main": [
+        [
+          {
+            "node": "1. Configure Search & Rules",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1. Configure Search & Rules": {
+      "main": [
+        [
+          {
+            "node": "2. Run UnitBytes (google-maps-photos-scraper)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2. Run UnitBytes (google-maps-photos-scraper)": {
+      "main": [
+        [
+          {
+            "node": "3. Skip Seen Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "3. Skip Seen Records": {
+      "main": [
+        [
+          {
+            "node": "4. Clean & Score Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4. Clean & Score Items": {
+      "main": [
+        [
+          {
+            "node": "5. Map Export Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "5. Map Export Fields": {
+      "main": [
+        [
+          {
+            "node": "6a. Log to Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "6b. Export Backup CSV",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "6c. Filter High-Priority Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "6c. Filter High-Priority Items": {
+      "main": [
+        [
+          {
+            "node": "7. AI Review Triage & Response Drafter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "7. AI Review Triage & Response Drafter": {
+      "main": [
+        [
+          {
+            "node": "8. Merge AI Review Audit & Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "8. Merge AI Review Audit & Reply": {
+      "main": [
+        [
+          {
+            "node": "9a. Send ORM Review Alert to Slack",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "9b. Draft ORM Incident Report in Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "030f9420-0ca8-5240-8fe8-208e287a8b19"
+  },
+  "tags": [
+    {
+      "name": "AI"
+    },
+    {
+      "name": "OpenAI"
+    },
+    {
+      "name": "Web Scraping"
+    },
+    {
+      "name": "Apify"
+    },
+    {
+      "name": "Reputation Intelligence"
+    }
+  ]
+}
