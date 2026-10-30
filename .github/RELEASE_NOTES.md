@@ -1,6 +1,6 @@
-### 🚀 v1.1.0 Release Notes — 🧲 Google Maps B2B Leads, Website Emails, Tech Stack & Ad Pixel Scraper + REST API (`$0.50 / 1K`)
+### 🚀 v1.1.0 Release Notes — 🧲 Google Maps B2B Leads, Website Emails, Tech Stack & Ad Pixel Scraper + REST API (`$1.00 / 1K`)
 
-The fastest Google Maps B2B Leads, Website Email, Phone, Social Media, CMS Tech Stack & Ad Pixel Enrichment Scraper on Apify (`$0.50 / 1,000 leads`) and `<500ms` Synchronous REST API on RapidAPI Hub & Zyla API Hub. Extract verified business emails, 6 social profiles, 12 CMS platforms, Meta/Google/TikTok ad pixels, `0–100` agency `lead_score`, and cold-outreach review hooks to CSV, Excel, Python, Colab, or OpenAI n8n Gmail Drafts.
+The fastest Google Maps B2B Leads, Website Email, Phone, Social Media, CMS Tech Stack & Ad Pixel Enrichment Scraper on Apify (`$1.00 / 1,000 leads`) and `<500ms` Synchronous REST API on RapidAPI Hub & Zyla API Hub. Extract verified business emails, 6 social profiles, 12 CMS platforms, Meta/Google/TikTok ad pixels, `0–100` agency `lead_score`, and cold-outreach review hooks to CSV, Excel, Python, Colab, or OpenAI n8n Gmail Drafts.
 
 - 📓 **1-Click Interactive Google Colab Notebook:** [**Open `notebooks/quickstart.ipynb` in Colab**](https://colab.research.google.com/github/unitbytes/google-maps-leads-scraper/blob/main/notebooks/quickstart.ipynb)
 - ⚡ **Synchronous REST API on RapidAPI Hub (`<500ms` GET, Free Tier):** [https://rapidapi.com/unitbytes/api/google-maps-b2b-leads-email-tech-stack-reviews-data-api](https://rapidapi.com/unitbytes/api/google-maps-b2b-leads-email-tech-stack-reviews-data-api)

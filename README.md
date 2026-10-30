@@ -1,4 +1,4 @@
-# 🧲 Google Maps B2B Leads, Website Emails, Tech Stack & Ad Pixel Scraper + REST API (`$0.50 / 1K`)
+# 🧲 Google Maps B2B Leads, Website Emails, Tech Stack & Ad Pixel Scraper + REST API (`$1.00 / 1K`)
 
 <div align="center">
 
@@ -10,7 +10,7 @@
 [![Release](https://img.shields.io/github/v/release/unitbytes/google-maps-leads-scraper?style=for-the-badge&logo=github&color=10b981)](https://github.com/unitbytes/google-maps-leads-scraper/releases)
 [![Pricing](https://img.shields.io/badge/Pricing-Pay_Per_Result-orange?style=for-the-badge)](https://apify.com/unitbytes/google-maps-leads-scraper?fpr=939u3w&fp_sid=gh_gmaps_leads)
 
-**The fastest Google Maps B2B Leads, Website Email, Phone, Social Media, CMS Tech Stack & Ad Pixel Enrichment Scraper on Apify (`$0.50 / 1,000 leads`) and `<500ms` Synchronous REST API on RapidAPI Hub & Zyla API Hub. Extract verified business emails, 6 social profiles, 12 CMS platforms, Meta/Google/TikTok ad pixels, `0–100` agency `lead_score`, and cold-outreach review hooks to CSV, Excel, Python, Colab, or OpenAI n8n Gmail Drafts.**
+**The fastest Google Maps B2B Leads, Website Email, Phone, Social Media, CMS Tech Stack & Ad Pixel Enrichment Scraper on Apify (`$1.00 / 1,000 leads`) and `<500ms` Synchronous REST API on RapidAPI Hub & Zyla API Hub. Extract verified business emails, 6 social profiles, 12 CMS platforms, Meta/Google/TikTok ad pixels, `0–100` agency `lead_score`, and cold-outreach review hooks to CSV, Excel, Python, Colab, or OpenAI n8n Gmail Drafts.**
 
 [**🚀 Try Live on Apify**](https://apify.com/unitbytes/google-maps-leads-scraper?fpr=939u3w&fp_sid=gh_gmaps_leads) • [**📓 Open in Google Colab**](https://colab.research.google.com/github/unitbytes/google-maps-leads-scraper/blob/main/notebooks/quickstart.ipynb) • [**⚡ RapidAPI Hub**](https://rapidapi.com/unitbytes/api/google-maps-b2b-leads-email-tech-stack-reviews-data-api) • [**⚡ Zyla API Hub**](https://zylalabs.com/api-marketplace/location+%26+mapping/maps+business+places+leads+and+reviews+api/14553) • [**⚡ Official n8n Creator Hub**](https://n8n.io/creators/unitbytes/) • [**🔧 41 Free n8n Templates**](https://unitbytes.com/n8n/) • [**📖 Documentation & Schemas**](https://unitbytes.com/actors/) • [**📚 Engineering Playbooks**](https://unitbytes.com/blog/)
 
@@ -20,7 +20,7 @@
 
 <p align="center">
   <a href="https://apify.com/unitbytes/google-maps-leads-scraper?fpr=939u3w&fp_sid=gh_gmaps_leads" target="_blank">
-    <img src="https://raw.githubusercontent.com/unitbytes/.github/main/assets/banners/unitbytes-google-maps-leads-scraper-banner.jpg" alt="🧲 Google Maps B2B Leads, Website Emails, Tech Stack & Ad Pixel Scraper + REST API (`$0.50 / 1K`)" width="100%" />
+    <img src="https://raw.githubusercontent.com/unitbytes/.github/main/assets/banners/unitbytes-google-maps-leads-scraper-banner.jpg" alt="🧲 Google Maps B2B Leads, Website Emails, Tech Stack & Ad Pixel Scraper + REST API (`$1.00 / 1K`)" width="100%" />
   </a>
 </p>
 
@@ -89,7 +89,7 @@ Launch pre-configured extraction templates directly in the Apify Cloud Console w
 | Use Case / Capability | [🧲 B2B Leads & Email Scraper](https://apify.com/unitbytes/google-maps-leads-scraper?fpr=939u3w&fp_sid=gh_gmaps_leads) | [⭐ 10K Bulk Reviews Scraper](https://apify.com/unitbytes/google-maps-reviews-scraper?fpr=939u3w&fp_sid=gh_gmaps_leads) | [🛡️ Review Monitor & Change Tracker](https://apify.com/unitbytes/google-maps-reviews-tracker?fpr=939u3w&fp_sid=gh_gmaps_leads) | [🕵️ Contributor & Local Guide Scraper](https://apify.com/unitbytes/google-maps-contributor-scraper?fpr=939u3w&fp_sid=gh_gmaps_leads) | [📸 4K Photos, Menus & Videos Scraper](https://apify.com/unitbytes/google-maps-photos-scraper?fpr=939u3w&fp_sid=gh_gmaps_leads) | [🇰🇷 Naver Map & Place Korea Scraper](https://apify.com/unitbytes/naver-place-scraper?fpr=939u3w&fp_sid=gh_gmaps_leads) | Official Google Places API |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Primary Best Fit** | **B2B Cold Outreach, SMMA & Local SEO Prospecting** | **Bulk Historical Review Datasets & Sentiment AI** | **Scheduled Change Diffing (`NEW`/`REMOVED`/`EDITED`), SLA & ORM** | **Fake Review Forensics & Influencer Scouting** | **Uncompressed (`=s0`) Menus, Storefronts & MP4s** | **South Korea POI Leads, KRW Menus & Blog Reviews** | Basic map widget display |
-| **Starting Price** | 💰 `$0.50 – $1.50 / 1K leads` | 💰 `$0.25 – $0.35 / 1K reviews` | `$1.20 – $1.50 / 1K checks` | `$0.80 – $1.00 / 1K reviews` | 💰 `$0.50 – $1.50 / 1K photos` | `$0.80 – $1.40 / 1K items` | ❌ `$17.00 – $40.00+ / 1K calls` |
+| **Starting Price** | 💰 `$1.00 – $2.00 / 1K leads` | 💰 `$0.25 – $0.35 / 1K reviews` | `$1.20 – $1.50 / 1K checks` | `$0.80 – $1.00 / 1K reviews` | 💰 `$0.50 – $1.50 / 1K photos` | `$0.80 – $1.40 / 1K items` | ❌ `$17.00 – $40.00+ / 1K calls` |
 | **Verified Emails, Phones & Socials** | **✅ Included Free (`primary_email`, `emails`, 6 Socials)** | — | — | — | — | **✅ Phone, Virtual Phone, Homepage & SNS Links** | ❌ Emails/Socials never returned |
 | **Website CMS, Ad Pixels & Pitch Flags** | **✅ 12 CMS + Meta/Google Pixels + 9 `agency_opportunity_flags`** | — | — | — | — | **✅ SmartPlace, Booking, NPay & Vertical Extras** | ❌ Never returned |
 | **Review Extraction Depth** | **✅ 1 Review Hook + 1-Click Report Link** | Up to 10,000 reviews/place | Up to 10,000 reviews/place | Up to 200 reviews/user | — | **✅ Visitor Receipt + Naver Blog Reviews** | Max 5 reviews (unsortable) |
@@ -102,13 +102,13 @@ Launch pre-configured extraction templates directly in the Apify Cloud Console w
 
 ### 🚀 Google Maps Email & Leads Scraper (`unitbytes/google-maps-leads-scraper`)
 
-Fast, low-cost Google Maps B2B Leads & Email Scraper (`$1.00–$2.00/1K`). Extract verified business emails, phones, WhatsApp, LinkedIn/Instagram/Facebook profiles, unclaimed GMB status, tech stack (WordPress/Shopify/Pixels), and cold-outreach review hooks into 48.
+Fast, low-cost Google Maps B2B Leads & Email Scraper (`$1.00–$2.00/1K`). Extract verified business emails, phones, WhatsApp, LinkedIn/Instagram/Facebook profiles, unclaimed GMB status, tech stack (WordPress/Shopify/Pixels), and cold-outreach review hooks into 48 flat CSV/Excel fields.
 
 - **Pricing:** `$0.002 / item` (Pay-Per-Event — `$0.002` b2b lead & contact scraped (volume tiers from `$0.001`))
 - **Cloud Console:** [https://apify.com/unitbytes/google-maps-leads-scraper?fpr=939u3w&fp_sid=gh_gmaps_leads](https://apify.com/unitbytes/google-maps-leads-scraper?fpr=939u3w&fp_sid=gh_gmaps_leads)
 - **Full Documentation & Schema:** [https://unitbytes.com/actors/google-maps-leads-scraper/](https://unitbytes.com/actors/google-maps-leads-scraper/)
 - **n8n Workflow File:** [`n8n/google-maps-leads-scraper-n8n-workflow.json`](n8n/google-maps-leads-scraper-n8n-workflow.json)
-- **Engineering Playbook:** [Google Maps B2B Leads & Email Scraper Guide (2026): Extract Verified Emails, Tech Stacks, Ad Pixels & Outreach Hooks (`$0.50/1K`)](https://unitbytes.com/blog/google-maps-leads-email-scraper-b2b-prospecting-guide/)
+- **Engineering Playbook:** [Google Maps B2B Leads & Email Scraper Guide (2026): Extract Verified Emails, Tech Stacks, Ad Pixels & Outreach Hooks (`$1.00/1K`)](https://unitbytes.com/blog/google-maps-leads-email-scraper-b2b-prospecting-guide/)
 
 #### Key Capabilities
 - **Google Maps + Website Email & Social Enrichment:** Automatically visits each business's official website plus /contact and /about subpages to extract verified emails (prioritizing owner@, founder@, ceo@, contact@ in primary_email) and E.164 phone numbers.
@@ -122,9 +122,9 @@ Fast, low-cost Google Maps B2B Leads & Email Scraper (`$1.00–$2.00/1K`). Extra
 | :--- | :---: | :--- | :--- |
 | `searchQueries` | `array` | `["dentists in Austin TX"]` | Enter your B2B category + city search queries (e.g. dentists in Austin TX, roofing contractors in Miami FL, medspas in Beverly Hills), Google Maps Search URLs (/maps/search/...), Business Place URLs (/maps/place/...), Place IDs (ChIJ...), or GPS coordinates (30.2672, -97.7431). |
 | `maxPlacesPerQuery` | `integer` | `20` | Maximum number of businesses to discover and enrich for each search query or /maps/search/... URL. (Default: 20, Max: 200) |
-| `scrapeContacts` | `boolean` | `True` | When enabled (default), automatically visits each business's official website and /contact / /about pages to extract verified email addresses (primary_email, emails), social media links (linkedin_url, instagram_url, facebook_url, tiktok_url, youtube_url), WhatsApp links, online. |
+| `scrapeContacts` | `boolean` | `True` | When enabled (default), automatically visits each business's official website and /contact / /about pages to extract verified email addresses (primary_email, emails), social media links (linkedin_url, instagram_url, facebook_url, tiktok_url, youtube_url), WhatsApp links, online booking links, website CMS (WordPress, Shopify, Wix, Webflow), and advertising pixels (Meta Pixel, Google Tag Manager). |
 | `includeReviewHook` | `boolean` | `True` | When enabled (default), extracts a featured customer review snippet (review_hook_text, review_hook_stars, review_hook_author, review_hook_date, review_hook_report_url) for each business so you can personalize cold emails or pitch reputation management services. |
-| `reviewHookType` | `string` | `most_relevant` | Choose which review to extract for the cold-outreach hook: • Most Relevant Highlight (most_relevant): Best overall review snippet for personalized cold email icebreakers. |
+| `reviewHookType` | `string` | `most_relevant` | Choose which review to extract for the cold-outreach hook: • Most Relevant Highlight (most_relevant): Best overall review snippet for personalized cold email icebreakers. • Lowest Rating / 1-Star Complaint First (lowest_rating): Pulls a 1-star or 2-star complaint plus its 1-click Google dispute link (review_hook_report_url) — ideal for reputation management (ORM) agencies. • Newest Review (newest): Pulls the most recent customer review. |
 | `language` | `string` | `en` | ISO language code (hl) for Google Maps results and categories (e.g. en, es, fr, de, pt-BR, ar, ja). |
 | `region` | `string` | `us` | 2-letter ISO country code (gl) used to bias search queries (e.g. us, gb, ca, au, de, fr, ae, in). |
 | `proxyConfiguration` | `object` | `{"useApifyProxy": true}` | Select the proxies to use. Apify Residential Proxies are automatically enabled by default for reliable Google Maps discovery. |
@@ -268,7 +268,7 @@ The enrichment engine decodes obfuscated mailto links, filters out noreply/sentr
 Every business is audited for digital marketing gaps and tagged with filterable flags—UNCLAIMED_GBP, NO_WEBSITE, NO_EMAIL_ON_SITE, MISSING_META_PIXEL, MISSING_GOOGLE_TAG, NO_ONLINE_BOOKING, and LOW_RATING_UNDER_4_2.
 
 **Q: How much does enriched Google Maps B2B lead extraction cost?**
-Runs cost `$0.50` per 1,000 leads (`$0.0005/lead`) with all 61 fields—website emails, social links, CMS/ad pixels, booking widgets, and review icebreakers—included at zero extra add-on fees.
+Runs start at `$1.00` per 1,000 leads (`$0.0010–$0.0020/lead`) with all 48 flat fields—website emails, social links, CMS/ad pixels, booking widgets, and review hooks—included at zero extra add-on fees.
 
 ---
 
@@ -434,7 +434,7 @@ Yes. Even after Google deletes the review text and author profile from public vi
   </a>
 </p>
 
-Monitor Google Maps businesses for NEW, REMOVED, EDITED, or UNANSWERED reviews. Diff Place URLs across runs, sort 1-star complaints first, filter by keyword, audit owner reply SLAs (response_time_hours), flag burner accounts, and generate 1-click Google dispute.
+Monitor Google Maps businesses for NEW, REMOVED, EDITED, or UNANSWERED reviews. Diff Place URLs across runs, sort 1-star complaints first, filter by keyword, audit owner reply SLAs (response_time_hours), flag burner accounts, and generate 1-click Google dispute links (review_report_url).
 
 - **Pricing:** `$0.0015 / item` (Pay-Per-Event — `$0.0015` result (volume tiers from `$0.0012`))
 - **Cloud Console:** [https://apify.com/unitbytes/google-maps-reviews-tracker?fpr=939u3w&fp_sid=gh_gmaps_leads](https://apify.com/unitbytes/google-maps-reviews-tracker?fpr=939u3w&fp_sid=gh_gmaps_leads)
@@ -583,7 +583,7 @@ When trackChanges is enabled, the Actor compares current reviews against your sa
   </a>
 </p>
 
-Scrape Google Maps contributor reviews, reviewer profiles, and Local Guide histories in <2s. Paste any Google Maps business place URL, search query, review link, or contributor URL to extract all reviews, reviewer ratings, levels, photos, owner replies & fake.
+Scrape Google Maps contributor reviews, reviewer profiles, and Local Guide histories in <2s. Paste any Google Maps business place URL, search query, review link, or contributor URL to extract all reviews, reviewer ratings, levels, photos, owner replies & fake review flags.
 
 - **Pricing:** `$0.002 / profile` (Pay-Per-Event — `$0.002` contributor profile, `$0.001` extracted review (volume tiers from `$0.0008`))
 - **Cloud Console:** [https://apify.com/unitbytes/google-maps-contributor-scraper?fpr=939u3w&fp_sid=gh_gmaps_leads](https://apify.com/unitbytes/google-maps-contributor-scraper?fpr=939u3w&fp_sid=gh_gmaps_leads)
